@@ -1,0 +1,30 @@
+Linux+ M2 Starter Files — INSTRUCTIONS
+=======================================
+SETUP:
+  1. Copy all files into your linux-plus-milestones GitHub repo root
+  2. Rename: mv deploy_starter.sh deploy.sh
+  3. Rename: mv README_template.md README.md  (update with your info)
+  4. chmod +x run_container.sh test_deploy.sh
+  5. git add . && git commit -m "Add M2 starter files" && git push origin main
+
+WORKFLOW (repeat for each work session):
+  1. Edit deploy.sh in VS Code (fill in TODO sections, write comments)
+  2. bash run_container.sh          <- starts Ubuntu 22.04 container
+  3. bash /opt/deploy/deploy.sh     <- runs your script inside the container
+  4. bash /opt/deploy/test_deploy.sh  <- verifies your deployment
+  5. exit                           <- exits and deletes the container
+  6. git add . && git commit -m "Section X complete" && git push origin main
+
+SUBMIT TO CANVAS:
+  - GitHub repo URL (must be public)
+  - Screenshot of git log --oneline (at least 3 commits)
+  - Screenshot of test_deploy.sh output
+  - This design_document_template.md completed and uploaded
+
+FILES:
+  Dockerfile                   - container image (do not edit)
+  run_container.sh             - start the container (run this)
+  deploy_starter.sh            - YOUR script skeleton -> rename to deploy.sh
+  test_deploy.sh               - verification script (run inside container)
+  README_template.md           - repo README -> rename to README.md
+  design_document_template.md  - design document -> complete and submit to Canvas
