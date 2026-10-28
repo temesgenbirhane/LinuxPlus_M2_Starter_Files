@@ -234,10 +234,6 @@ log "Section 4 complete"
 
 # YOUR CODE HERE:
 
-ufw allow 80/tcp
-ufw allow 443/tcp
-ufw --force enable    # --force skips the y/n prompt that would hang the script
-
 # Ports: 80 is HTTP and 443 is HTTPS. A web server needs both so browsers can
 # connect either way. Everything else stays closed to reduce attack surface.
 #
@@ -249,6 +245,19 @@ ufw --force enable    # --force skips the y/n prompt that would hang the script
 # rules, so errors here come from the container, not the commands. On a real
 # server I would allow SSH (22) first and verify with "ufw status verbose".
 
+
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw --force enable    # --force skips the y/n prompt that would hang the script
+
+# OBSERVED IN THIS CONTAINER: ufw printed "ERROR: problem running iptables:
+# ... Could not fetch rule set generation id: Permission denied (you must be
+# root)". The allow rules for ports 80 and 443 were saved to
+# /etc/ufw/user.rules, but ufw could not apply them or enable the firewall.
+# Cause: the container lacks the NET_ADMIN capability needed to change
+# firewall rules, even though the script runs as root. The commands are
+# correct for a real server, where I would allow SSH (22) first and verify
+# with "ufw status verbose"
 log "Section 5 complete"
 
 
@@ -274,7 +283,27 @@ log "Section 5 complete"
 #       (crontab -l 2>/dev/null; echo "0 2 * * 0 /usr/sbin/logrotate /etc/logrotate.conf") | crontab -
 
 # YOUR CODE HERE:
+# Add a weekly logrotate job to root's crontab without overwriting
+# any existing cron jobs.
+# Cron expression: 0 2 * * 0
+#   0 = minute 0
+#   2 = hour 2 (2:00 AM)
+#   * = every day of the month
+#   * = every month
+#   0 = Sunday
+# Therefore, the command runs every Sunday at 2:00 AM.
+(crontab -l 2>/dev/null; echo "0 2 * * 0 /usr/sbin/logrotate /etc/logrotate.conf") | crontab -
 
+# Log rotation prevents log files from continuously growing.
+# Without log rotation, logs can consume increasing amounts of disk space
+# and could eventually fill the filesystem.
+
+# /etc/logrotate.conf is the main configuration file for logrotate.
+# It controls how configured logs are rotated, including settings such as
+# rotation frequency, retention, compression, and related behavior.
+
+# Log confirmation that the weekly logrotate cron entry was added.
+echo "Weekly logrotate cron job added for root"
 
 log "Section 6 complete"
 log "============================================================"
