@@ -82,6 +82,8 @@ log "============================================================"
 # log in. Checking first makes the script safe to re-run.
 # -s flag lets you specify the login shell for the user. 
 #Using /sbin/nologin ensures the account cannot be used for interactive login.
+# -m = create the user's home directory
+# -d = specify what/where the user's home directory should be
 
 if id webservice &>/dev/null; then
     echo "User webservice already exists"
@@ -167,11 +169,13 @@ log "Section 2 complete"
 # Checking the exit code prevents the deployment from continuing
 # when Apache was not successfully installed.
 apt-get update && apt-get install -y apache2
-if [ $? -ne 0 ]; then
+if [ $? -ne 0 ]; then    # $?holds the exit status of the most recently executed command
     log "Failed to install apache2"
     exit 1 # Terminate the whole script if apache is not installed
 fi
 
+# Apache remains a widely used and established web server, 
+# even though alternatives like Nginx may be better suited for certain workloads.
 log "Section 3 complete"
 
 
@@ -202,10 +206,11 @@ log "Section 3 complete"
 # "enable" makes apache2 start automatically at boot. It does not start it now.
 # "start" runs apache2 right now. It does not survive a reboot.
 # A real server needs both.
+
 systemctl enable apache2
 systemctl start apache2
-# On a real Linux server, I would verify the service with:
-# systemctl status apache2
+
+# On a real Linux server, I would verify the service with: systemctl status apache2
 
 # Container observation:
 # When I attempted to start Apache2 with systemctl, I received:
