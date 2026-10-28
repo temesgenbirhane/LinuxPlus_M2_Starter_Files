@@ -2,8 +2,8 @@
 # ============================================================
 # Linux+ Milestone 2 — Server Deployment Script
 #
-# Student:     [YOUR FULL NAME]
-# Date:        [DATE]
+# Student:     [Temesgen Tesfahunegn]
+# Date:        [10/28/2026]
 # Environment: Ubuntu 22.04 container (Docker)
 # Scenario:    Deploy and harden a web server role
 #
