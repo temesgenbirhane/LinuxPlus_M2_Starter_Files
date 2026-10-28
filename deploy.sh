@@ -201,7 +201,16 @@ log "Section 3 complete"
 # A real server needs both.
 systemctl enable apache2
 systemctl start apache2
+# On a real Linux server, I would verify the service with:
+# systemctl status apache2
 
+# Container observation:
+# When I attempted to start Apache2 with systemctl, I received:
+# "System has not been booted with systemd as init system (PID 1). Can't operate."
+# "Failed to connect to bus: Host is down"
+# This occurs because systemd is not running as PID 1 in this container.
+# Without systemd running as the init system, systemctl cannot communicate
+# with systemd to manage the Apache2 service.
 log "Section 4 complete"
 
 
@@ -225,6 +234,20 @@ log "Section 4 complete"
 
 # YOUR CODE HERE:
 
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw --force enable    # --force skips the y/n prompt that would hang the script
+
+# Ports: 80 is HTTP and 443 is HTTPS. A web server needs both so browsers can
+# connect either way. Everything else stays closed to reduce attack surface.
+#
+# Default policy: ufw denies all incoming and allows all outgoing traffic,
+# so these rules are exceptions for web traffic only.
+#
+# OBSERVED IN THIS CONTAINER: <paste the exact ufw output here>
+# The container lacks the permissions (NET_ADMIN) ufw needs to change firewall
+# rules, so errors here come from the container, not the commands. On a real
+# server I would allow SSH (22) first and verify with "ufw status verbose".
 
 log "Section 5 complete"
 
