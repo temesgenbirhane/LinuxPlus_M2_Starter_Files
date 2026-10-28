@@ -212,6 +212,9 @@ systemctl start apache2
 
 # On a real Linux server, I would verify the service with: systemctl status apache2
 
+# Ran: ps -p 1 -o pid,comm,args to see the PID 1 process in the container = bash
+# PID1 is the first/main process inside that container
+
 # Container observation:
 # When I attempted to start Apache2 with systemctl, I received:
 # "System has not been booted with systemd as init system (PID 1). Can't operate."
@@ -220,8 +223,9 @@ systemctl start apache2
 # Without systemd running as the init system, systemctl cannot communicate
 # with systemd to manage the Apache2 service.
 # It is acting up because Docker containers are designed to run a single process (like Apache) 
-# rather than a whole operating system manager. So use apache2ctl -D FOREGROUND 
-# to start Apache in the foreground instead. 
+# rather than a whole operating system manager. 
+# I got recommended to use apache2ctl -D FOREGROUND by AI, But my test did not work
+
 log "Section 4 complete"
 
 
@@ -260,7 +264,8 @@ log "Section 4 complete"
 # Problem running '/etc/ufw/user.rules'
     # OBSERVED IN THIS CONTAINER: 
 # The container lacks the permissions (NET_ADMIN) ufw needs to change firewall
-# rules, so errors here come from the container, not the commands. 
+# rules, so errors here come from the container, not the commands.
+# Alternatively we can Configure the firewall on the Docker host itself, rather than inside the container.
 # On a real server I would also add SSH (22) for remote access.
 
 
