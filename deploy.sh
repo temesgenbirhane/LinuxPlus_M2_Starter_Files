@@ -73,13 +73,15 @@ log "============================================================"
 #         - Which flag sets a non-login shell and what value does it use?
 #
 # HINT: Look up: useradd --help or man useradd
-#       Key flags: -r (system account), -s (shell), -d (home directory), -m (create home)
+#       Key flags: -r (system account), -s (shell), -d (Define home directory location), -m (make home directory)
 
 # YOUR CODE HERE:
 
 # Create a system account with no interactive login. A web server process
 # should only run the service, so a compromised account can't be used to
 # log in. Checking first makes the script safe to re-run.
+# -s flag lets you specify the login shell for the user. 
+#Using /sbin/nologin ensures the account cannot be used for interactive login.
 
 if id webservice &>/dev/null; then
     echo "User webservice already exists"
@@ -114,11 +116,12 @@ log "Section 1 complete"
 
 # YOUR CODE HERE:
 
-# Create the web root only if it is missing. -p creates parent directories
-# as needed and does not error if the directory already exists, so the script
+# -p allows us to create a directory only if it does not already exist
+# and allows you to create a deep stack of nested folders all at once, 
+# rather than having to build them one by one from the outside in.
 # is safe to run more than once (idempotent).
 mkdir -p /var/www/html
-# The service shouldown the content it serves, so it can manage that content without needing
+# The service should own the content it serves, so it can manage that content without needing
 # root privileges
 chown webservice /var/www/html
 # Directories need the execute (x) bit so users and processes can enter them,
@@ -166,7 +169,7 @@ log "Section 2 complete"
 apt-get update && apt-get install -y apache2
 if [ $? -ne 0 ]; then
     log "Failed to install apache2"
-    exit 1
+    exit 1 # Terminate the whole script if apache is not installed
 fi
 
 log "Section 3 complete"
@@ -211,6 +214,9 @@ systemctl start apache2
 # This occurs because systemd is not running as PID 1 in this container.
 # Without systemd running as the init system, systemctl cannot communicate
 # with systemd to manage the Apache2 service.
+# It is acting up because Docker containers are designed to run a single process (like Apache) 
+# rather than a whole operating system manager. So use apache2ctl -D FOREGROUND 
+# to start Apache in the foreground instead. 
 log "Section 4 complete"
 
 
@@ -239,25 +245,24 @@ log "Section 4 complete"
 #
 # Default policy: ufw denies all incoming and allows all outgoing traffic,
 # so these rules are exceptions for web traffic only.
-#
-# OBSERVED IN THIS CONTAINER: <paste the exact ufw output here>
+
+    # OBSERVED WARNING MESSAGE ON THIS CONTAINER: ufw printed "ERROR: problem running iptables:
+# ERROR: problem running ufw-init
+# iptables: Permission denied (you must be root)
+# iptables-restore: Couldn't load match `conntrack': No such file or directory
+# Problem running '/etc/ufw/before.rules'
+# Problem running '/etc/ufw/after.rules'
+# Problem running '/etc/ufw/user.rules'
+    # OBSERVED IN THIS CONTAINER: 
 # The container lacks the permissions (NET_ADMIN) ufw needs to change firewall
-# rules, so errors here come from the container, not the commands. On a real
-# server I would allow SSH (22) first and verify with "ufw status verbose".
+# rules, so errors here come from the container, not the commands. 
+# On a real server I would also add SSH (22) for remote access.
 
 
 ufw allow 80/tcp
 ufw allow 443/tcp
 ufw --force enable    # --force skips the y/n prompt that would hang the script
 
-# OBSERVED IN THIS CONTAINER: ufw printed "ERROR: problem running iptables:
-# ... Could not fetch rule set generation id: Permission denied (you must be
-# root)". The allow rules for ports 80 and 443 were saved to
-# /etc/ufw/user.rules, but ufw could not apply them or enable the firewall.
-# Cause: the container lacks the NET_ADMIN capability needed to change
-# firewall rules, even though the script runs as root. The commands are
-# correct for a real server, where I would allow SSH (22) first and verify
-# with "ufw status verbose"
 log "Section 5 complete"
 
 
@@ -283,8 +288,7 @@ log "Section 5 complete"
 #       (crontab -l 2>/dev/null; echo "0 2 * * 0 /usr/sbin/logrotate /etc/logrotate.conf") | crontab -
 
 # YOUR CODE HERE:
-# Add a weekly logrotate job to root's crontab without overwriting
-# any existing cron jobs.
+# Add a weekly logrotate job to root's crontab without overwriting any existing cron jobs.
 # Cron expression: 0 2 * * 0
 #   0 = minute 0
 #   2 = hour 2 (2:00 AM)
