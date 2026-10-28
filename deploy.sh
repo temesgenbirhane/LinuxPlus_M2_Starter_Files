@@ -77,6 +77,10 @@ log "============================================================"
 
 # YOUR CODE HERE:
 
+# Create a system account with no interactive login. A web server process
+# should only run the service, so a compromised account can't be used to
+# log in. Checking first makes the script safe to re-run.
+
 if id webservice &>/dev/null; then
     echo "User webservice already exists"
 else
@@ -110,6 +114,24 @@ log "Section 1 complete"
 
 # YOUR CODE HERE:
 
+# Create the web root only if it is missing. -p creates parent directories
+# as needed and does not error if the directory already exists, so the script
+# is safe to run more than once (idempotent).
+mkdir -p /var/www/html
+# The service shouldown the content it serves, so it can manage that content without needing
+# root privileges
+chown webservice /var/www/html
+# Directories need the execute (x) bit so users and processes can enter them,
+# which Apache needs in order to serve files from inside.
+# "Other" must never have write permission on a web root: if any local user
+# or compromised process could write here, they could replace or add pages,
+# for example to host malware or deface the site. 755 gives Apache the read
+# access it needs while keeping write access limited to the owner.
+chmod 755 /var/www/html
+# 
+echo "Web service is running" > /var/www/html/index.html
+
+chown webservice /var/www/html/index.html
 
 log "Section 2 complete"
 
