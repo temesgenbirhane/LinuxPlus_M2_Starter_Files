@@ -155,6 +155,19 @@ log "Section 2 complete"
 
 # YOUR CODE HERE:
 
+# Refresh the package index first so apt knows the current package versions.
+# A fresh container often has an empty index, and the install fails without this.
+# Install the apache2 web server package using apt-get and the y flag to automatically accept prompts
+
+# $? contains the exit status of the previous command.
+# 0 means the installation succeeded; non-zero means it failed.
+# Checking the exit code prevents the deployment from continuing
+# when Apache was not successfully installed.
+apt-get update && apt-get install -y apache2
+if [ $? -ne 0 ]; then
+    log "Failed to install apache2"
+    exit 1
+fi
 
 log "Section 3 complete"
 
