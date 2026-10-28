@@ -196,6 +196,11 @@ log "Section 3 complete"
 
 # YOUR CODE HERE:
 
+# "enable" makes apache2 start automatically at boot. It does not start it now.
+# "start" runs apache2 right now. It does not survive a reboot.
+# A real server needs both.
+systemctl enable apache2
+systemctl start apache2
 
 log "Section 4 complete"
 
