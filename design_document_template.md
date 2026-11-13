@@ -147,7 +147,7 @@ Paste the output of `git log --oneline` showing at least 3 commits:
 ```
 altered deploy.sh
 725a9aa Added last touch comments for clarity
-be46b2c Added appropriate documentation using github copilot
+be46b2c Added appropriate documentation using github copilot    # I have rewrote the script now
 7028e08 modified comments and added few extra touches
 6c35441 testing sync
 1053408  Set up log rotation Section_6
